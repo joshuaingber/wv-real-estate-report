@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 *.bak
+# Local notes that may hold credentials — never commit (this is a PUBLIC repo).
+*.local.md
 .venv/
 venv/
 .env
