@@ -36,12 +36,14 @@ def build_permit_history(permits_county: pd.DataFrame, county_name: str) -> go.F
         barmode="stack",
         title=dict(text=f"{county_name} County — Residential Permits by Year",
                    x=0.02, font=dict(size=15)),
-        height=340, margin=dict(t=44, b=40, l=60, r=20),
+        height=360, margin=dict(t=44, b=84, l=60, r=20),
         paper_bgcolor="white", plot_bgcolor="white",
         font=dict(family=PLOTLY_FONT),
         xaxis=dict(title="Year", showgrid=False),
         yaxis=dict(title="Units authorized", gridcolor="#EEEEEE"),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        # Legend below the plot so it never collides with the title at the top.
+        legend=dict(orientation="h", yanchor="top", y=-0.28, x=0.5,
+                    xanchor="center"),
     )
     return fig
 
