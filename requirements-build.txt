@@ -1,0 +1,11 @@
+# Slim dep set for the static-HTML build (used by .github/workflows/update-data.yml).
+# `build.py` does NOT import streamlit; keep this file minimal so CI doesn't pull
+# the ~200 MB streamlit dependency tree on every run. Keep in sync with
+# requirements.txt for any new build-side dep.
+pandas>=2.0.0
+plotly>=5.18.0
+requests>=2.31.0
+statsmodels>=0.14,<0.16
+openpyxl>=3.1
+pyarrow>=14
+python-dotenv>=1.0

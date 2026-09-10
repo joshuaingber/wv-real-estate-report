@@ -1,0 +1,29 @@
+__pycache__/
+*.pyc
+*.bak
+.venv/
+venv/
+.env
+.claude/
+*.egg-info/
+dist/
+build/
+.DS_Store
+
+# Data caches are derived artifacts. Ignore the big ones, but commit the small
+# API-sourced parquets so CI has a last-good fallback when a fresh fetch fails
+# (FHFA/ACS/FRED/BPS/HUD; see data/fetch_*.py). The county GeoJSON and any large
+# raw downloads stay out of git.
+data/cache/*
+!data/cache/wv_fhfa_hpi.parquet
+!data/cache/wv_acs_housing.parquet
+!data/cache/wv_realtor.parquet
+!data/cache/wv_permits.parquet
+!data/cache/wv_fmr.parquet
+scratch/
+
+# Node / accessibility tooling (pa11y-ci). node_modules is installed on demand;
+# the runtime pa11y config is generated per-run by scripts/a11y.mjs.
+node_modules/
+.npm-cache/
+.pa11yci.runtime.json

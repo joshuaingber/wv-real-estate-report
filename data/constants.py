@@ -1,0 +1,231 @@
+"""
+Constants for the West Virginia Regional Real Estate Report.
+
+FIPS codes, data-source endpoints, ACS variables, and the WVU color palette.
+Architecture and conventions adapted from the Upper Peninsula Regional Economic
+Report (github.com/joshuaingber/upper-peninsula-economic-report). Geography here
+is all 55 counties of West Virginia (state FIPS 54); branding follows the West
+Virginia University brand.
+
+Scope is RESIDENTIAL real estate. Free, county-level commercial real estate data
+(rents, vacancy, cap rates, CRE prices) is not publicly available, so it is out
+of scope by design — not omitted by oversight.
+"""
+from __future__ import annotations
+
+from datetime import date
+
+# ── Geography ─────────────────────────────────────────────────────────────────
+# All 55 counties of West Virginia (state FIPS 54; county codes are the odd
+# numbers 001–109). FIPS → name, ordered alphabetically for the county dropdown.
+# This is the canonical, stable list — hardcoded rather than fetched so the app
+# has no network dependency just to enumerate its own geography.
+STATE_FIPS = "54"
+
+COUNTIES = {
+    "54001": "Barbour",
+    "54003": "Berkeley",
+    "54005": "Boone",
+    "54007": "Braxton",
+    "54009": "Brooke",
+    "54011": "Cabell",
+    "54013": "Calhoun",
+    "54015": "Clay",
+    "54017": "Doddridge",
+    "54019": "Fayette",
+    "54021": "Gilmer",
+    "54023": "Grant",
+    "54025": "Greenbrier",
+    "54027": "Hampshire",
+    "54029": "Hancock",
+    "54031": "Hardy",
+    "54033": "Harrison",
+    "54035": "Jackson",
+    "54037": "Jefferson",
+    "54039": "Kanawha",
+    "54041": "Lewis",
+    "54043": "Lincoln",
+    "54045": "Logan",
+    "54047": "McDowell",
+    "54049": "Marion",
+    "54051": "Marshall",
+    "54053": "Mason",
+    "54055": "Mercer",
+    "54057": "Mineral",
+    "54059": "Mingo",
+    "54061": "Monongalia",
+    "54063": "Monroe",
+    "54065": "Morgan",
+    "54067": "Nicholas",
+    "54069": "Ohio",
+    "54071": "Pendleton",
+    "54073": "Pleasants",
+    "54075": "Pocahontas",
+    "54077": "Preston",
+    "54079": "Putnam",
+    "54081": "Raleigh",
+    "54083": "Randolph",
+    "54085": "Ritchie",
+    "54087": "Roane",
+    "54089": "Summers",
+    "54091": "Taylor",
+    "54093": "Tucker",
+    "54095": "Tyler",
+    "54097": "Upshur",
+    "54099": "Wayne",
+    "54101": "Webster",
+    "54103": "Wetzel",
+    "54105": "Wirt",
+    "54107": "Wood",
+    "54109": "Wyoming",
+}
+
+# County boundary geometry: the standard plotly US-counties GeoJSON keyed on
+# 5-digit FIPS, filtered to state 54 so the map frames West Virginia tightly.
+GEOJSON_URL = (
+    "https://raw.githubusercontent.com/plotly/datasets/master/"
+    "geojson-counties-fips.json"
+)
+
+# ── West Virginia University color palette ───────────────────────────────────
+# Web-optimized WVU brand hex (scm.wvu.edu/brand). "Gold and Blue," in that order.
+#   WVU Blue #002855 — very high contrast on white (~12:1); the primary data ink.
+#   WVU Gold #EEAA00 — ~1.7:1 on white: FILLS AND LARGE SHAPES ONLY, never thin
+#                      lines or text. Gold-on-blue is the signature pairing.
+WVU_BLUE = "#002855"
+WVU_GOLD = "#EEAA00"
+
+# Secondary / neutral brand hues.
+SAFETY_BLUE = "#0062A3"   # secondary blue
+WOODBURN = "#8D4638"      # warm brick — the "decline / negative" emphasis color
+RATTLER_GRAY = "#554741"  # axes, labels, captions
+COOPERS_GRAY = "#BFB8B3"  # decorative droplines, faded "before" marks (not text)
+WILD_FLOUR = "#F2E6C2"    # pale region fill
+NOT_QUITE_WHITE = "#FAF9F8"
+COAL = "#1B222D"
+
+# ── Accessible-contrast tokens (WCAG 2.1 AA) ─────────────────────────────────
+# Brand hues that fail contrast on white are replaced, in text/UI/data-bearing
+# roles, by these. Ratios are against #FFFFFF.
+WVU_LINK = WVU_BLUE          # ~12:1 — link text (also underlined, never color-only)
+WVU_MUTED = "#595959"        # ~7:1  — captions, sources, footer
+WVU_BORDER = "#767676"       # ~4.5:1 — structural UI borders and focus rings
+WVU_GOLD_DARK = "#7F6310"    # WVU "Old Gold" (web) ~5.4:1 — gold hue in text/data roles
+SEMANTIC_RED = WOODBURN      # negative deltas / decline (paired with a redundant cue)
+
+# Diverging scale for choropleths shaded by a year-over-year CHANGE (e.g. HPI
+# growth): decline (Woodburn) → ≈flat (gold, the zmid) → growth (WVU Blue).
+# A single map border color can't clear 3:1 against both the pale-gold midtone
+# and the dark ends, so black borders are the best-effort separation cue and the
+# data table remains the normative fallback (WCAG 1.1.1).
+MAP_DIVERGING_SCALE = [
+    [0.0, WOODBURN],
+    [0.5, WVU_GOLD],
+    [1.0, WVU_BLUE],
+]
+
+# Sequential scale for choropleths shaded by a LEVEL (e.g. median $/sqft): pale
+# blue → WVU Blue. On-brand and colorblind-safe.
+MAP_SEQUENTIAL_BLUE = [
+    [0.0, "#E6ECF2"],
+    [0.5, SAFETY_BLUE],
+    [1.0, WVU_BLUE],
+]
+
+# ── Typography ───────────────────────────────────────────────────────────────
+# WVU's web/body workhorse is Helvetica (Helvetica Neue). The brand display faces
+# (Config, Antonia) are Adobe-licensed and not freely embeddable, so we use the
+# Helvetica/Arial system stack the WVU Design System falls back to.
+WVU_FONT_FAMILY = '"Helvetica Neue", Helvetica, Arial, sans-serif'
+PLOTLY_FONT = "Helvetica Neue, Helvetica, Arial, sans-serif"
+# No Google Fonts import needed — the Helvetica stack is system-resident. Kept as
+# an empty string so build.py can inject it unconditionally.
+GOOGLE_FONTS_IMPORT = ""
+
+# Per-county identity colors for single-county trend lines. Thin marks on white
+# must clear WCAG 1.4.11 (>=3:1), so bright gold is swapped for its dark token.
+_COUNTY_PALETTE = [
+    WVU_BLUE, WVU_GOLD_DARK, SAFETY_BLUE, WOODBURN, RATTLER_GRAY,
+]
+COUNTY_COLORS = {
+    name: _COUNTY_PALETTE[i % len(_COUNTY_PALETTE)]
+    for i, name in enumerate(COUNTIES.values())
+}
+
+# ── Data-source endpoints ─────────────────────────────────────────────────────
+# NOTE ON VERIFICATION: exact download URLs and FRED series IDs below are
+# resolved / confirmed against the live source by the fetchers (data/fetch_*.py)
+# before use. Anything a fetcher can't confirm is skipped and the affected panel
+# degrades to "—" rather than showing a fabricated number.
+
+# FHFA House Price Index — annual, county-level, all-transactions (public domain).
+# The developmental county file. VERIFIED 2026-09: the .xlsx below returns a
+# 5 MB workbook; the older .csv paths 404. The fetcher tries these in order and
+# verifies the response content before caching.
+FHFA_HPI_COUNTY_CANDIDATES = [
+    "https://www.fhfa.gov/document/hpi_at_bdl_county.xlsx",
+]
+
+# Census Data API — American Community Survey 5-year (county housing profile).
+# 5-year estimates are used because they cover every county, including the small
+# ones. The fetcher walks back from the newest year until the API responds.
+# VERIFIED 2026-09: the API REQUIRES a key — a keyless call redirects to
+# missing_key.html. Get a free instant key at
+# https://api.census.gov/data/key_signup.html and put it in .env (CENSUS_API_KEY).
+CENSUS_API_BASE = "https://api.census.gov/data"
+ACS_DATASET = "acs/acs5"
+ACS_START_YEAR = date.today().year - 1  # newest plausible ACS5 vintage; fetcher steps back
+# Variable → friendly column name.
+ACS_VARIABLES = {
+    "B25077_001E": "median_home_value",   # Median value (owner-occupied units)
+    "B25064_001E": "median_gross_rent",   # Median gross rent
+    "B25003_001E": "occupied_units",       # Occupied housing units (denominator)
+    "B25003_002E": "owner_occupied_units", # Owner-occupied (→ ownership rate)
+    "B25001_001E": "total_housing_units",  # Total housing units
+    "B25035_001E": "median_year_built",    # Median year structure built
+    "B25002_002E": "occupied_total",       # Occupied (for vacancy rate denom)
+    "B25002_003E": "vacant_units",         # Vacant housing units
+}
+
+# FRED API — monthly Realtor.com county listing series (public domain via FRED).
+# County series follow the pattern <METRIC-PREFIX> + <5-digit FIPS>. The naming
+# is IRREGULAR across metrics (price series take no infix; count series take a
+# "COU" infix), so these prefixes were VERIFIED individually against the live
+# FRED API on 2026-09 for WV counties. The fetcher still validates each
+# constructed series ID and skips any that 400 (coverage is sparse for the
+# smallest counties, e.g. Wirt 54105 has none).
+FRED_API_BASE = "https://api.stlouisfed.org/fred"
+FRED_REALTOR_COUNTY_PREFIXES = {
+    "median_list_price":       "MEDLISPRI",           # $  — Median Listing Price
+    "median_list_ppsf":        "MEDLISPRIPERSQUFEE",  # $  — Median Listing Price / Sq Ft
+    "median_days_on_market":   "MEDDAYONMAR",         # days — Median Days on Market
+    "active_listings":         "ACTLISCOU",           # count — Active Listing Count
+    "new_listings":            "NEWLISCOU",           # count — New Listing Count
+}
+# Units per metric, for axis/hover formatting downstream.
+FRED_REALTOR_UNITS = {
+    "median_list_price":     "usd",
+    "median_list_ppsf":      "usd",
+    "median_days_on_market": "days",
+    "active_listings":       "count",
+    "new_listings":          "count",
+}
+
+# Census Building Permits Survey — county residential permits (public domain).
+# Annual county files live at .../County/co{YYYY}a.txt. The fetcher pulls a span
+# of recent years and verifies each file before use.
+BPS_COUNTY_BASE = "https://www2.census.gov/econ/bps/County"
+BPS_START_YEAR = 2000
+
+# HUD USER Fair Market Rents API (federal public data; free bearer token).
+# County entity id = state FIPS + county FIPS + "99999".
+HUD_FMR_BASE = "https://www.huduser.gov/hudapi/public/fmr"
+
+# ── Data-source display metadata (for on-page citations) ──────────────────────
+SOURCES = {
+    "fhfa":    ("FHFA House Price Index", "https://www.fhfa.gov/data/hpi", "Annual"),
+    "acs":     ("U.S. Census Bureau, ACS 5-Year", "https://www.census.gov/programs-surveys/acs", "Annual"),
+    "realtor": ("Realtor.com via FRED", "https://fred.stlouisfed.org", "Monthly"),
+    "bps":     ("U.S. Census Bureau, Building Permits Survey", "https://www.census.gov/construction/bps", "Monthly / Annual"),
+    "hud":     ("HUD Fair Market Rents", "https://www.huduser.gov/portal/datasets/fmr.html", "Annual"),
+}

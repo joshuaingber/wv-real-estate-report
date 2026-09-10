@@ -1,0 +1,10 @@
+[theme]
+# WVU brand: Blue primary, Not Quite White background, Rattler Gray body text.
+primaryColor = "#002855"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#FAF9F8"
+textColor = "#554741"
+font = "sans serif"
+
+[server]
+headless = true

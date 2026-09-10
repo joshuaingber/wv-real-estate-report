@@ -1,0 +1,62 @@
+name: Update Dashboard Data
+
+on:
+  schedule:
+    # Every Monday at 6:00 AM UTC (1:00 AM Eastern). The underlying data is
+    # monthly/annual, so a weekly refresh is plenty.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:  # Allow manual trigger from the GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: requirements-build.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-build.txt
+
+      - name: Build static dashboard
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+          HUD_TOKEN: ${{ secrets.HUD_TOKEN }}
+        run: python build.py
+
+      # WCAG 2.1 AA gate. Runs AFTER the build and BEFORE the commit, so a
+      # regression fails the job and the commit step is skipped — the last good
+      # published pages are preserved (same fail-safe as the cache fallback). The
+      # gate is data-independent (structure/contrast/ARIA don't change with the
+      # numbers), so a passing build keeps passing week to week.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Accessibility gate (WCAG 2.1 AA)
+        run: |
+          npm install
+          npm run a11y
+
+      - name: Commit and push if changed
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: 'Update dashboard data'
+          # Bare 'docs' (no glob) so git add recurses into docs/embeds/<county>/.
+          # A 'docs/*' glob would only match top-level files and skip embeds.
+          # Also commit the small API caches so each successful run refreshes the
+          # last-good fallback used when a later fetch fails (see data/fetch_*.py).
+          file_pattern: >-
+            docs
+            data/cache/wv_fhfa_hpi.parquet
+            data/cache/wv_acs_housing.parquet
+            data/cache/wv_realtor.parquet
+            data/cache/wv_permits.parquet
+            data/cache/wv_fmr.parquet
