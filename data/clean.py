@@ -114,7 +114,8 @@ def latest_summary(data: RealEstateData) -> pd.DataFrame:
     if not data.acs.empty:
         base = base.merge(
             data.acs[["fips", "median_home_value", "median_gross_rent",
-                      "ownership_rate", "vacancy_rate", "acs_year"]],
+                      "ownership_rate", "vacancy_rate", "median_year_built",
+                      "total_housing_units", "acs_year"]],
             on="fips", how="left")
 
     # Permits: latest year's total.

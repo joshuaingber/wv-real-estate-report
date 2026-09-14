@@ -1,0 +1,117 @@
+<header class="mast">
+  <div class="wrap">
+    <p class="eyebrow"><span>West Virginia University</span><span>Residential real estate</span><span>55 counties · FIPS 54</span></p>
+    <div class="mast-grid">
+      <div>
+        <h1>West Virginia <em>Real Estate</em> Report</h1>
+        <p class="thesis" id="thesis"></p>
+      </div>
+      <div class="silhouette" aria-hidden="true"><svg id="sil"></svg></div>
+    </div>
+    <div class="ladder">
+      <div class="ladder-head">
+        <p class="eyebrow">Median home value, every county on one scale</p>
+        <div class="readout" id="readout" aria-live="polite"></div>
+      </div>
+      <svg id="ladder" role="img" aria-label="Strip plot of median home value for all 55 West Virginia counties. Full values are in the county table below."></svg>
+    </div>
+    <div class="stamp"><span>Updated September 10, 2026</span><span>Public data, refreshed weekly</span><span>Home values: ACS 5-year <span id="acsY"></span></span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section aria-labelledby="atlas-h">
+    <div class="sec-head">
+      <p class="eyebrow">The atlas</p>
+      <h2 id="atlas-h">Pick a measure, then a county</h2>
+      <p>Shading uses fixed price bands, so a color means the same dollar range wherever it appears. Hatched counties have no published figure for that measure. Nothing is estimated to fill the gap.</p>
+    </div>
+    <div class="atlas">
+      <div class="atlas-map">
+        <div class="metric-tabs" role="group" aria-label="Map measure" id="tabs"></div>
+        <div class="map-meta"><h3 id="map-title"></h3><span class="cov" id="map-cov"></span></div>
+        <div class="map-box" id="mapbox">
+          <svg id="map" role="img" aria-labelledby="map-title"></svg>
+          <div class="tip" id="tip" hidden></div>
+        </div>
+        <div class="legend" id="legend"></div>
+        <p class="map-note" id="map-note"></p>
+      </div>
+      <div class="profile" aria-live="polite">
+        <div class="picker">
+          <label for="county-select" class="eyebrow">County</label>
+          <select id="county-select"></select>
+        </div>
+        <div class="pname"><h3 id="p-name"></h3><span class="mono" id="p-fips"></span></div>
+        <p class="rank" id="p-rank"></p>
+        <div class="pos"><p class="eyebrow" id="pos-h"></p><svg id="pos" role="img"></svg></div>
+        <dl class="kpis" id="kpis"></dl>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="trend-h">
+    <div class="sec-head">
+      <p class="eyebrow">County trends</p>
+      <h2 id="trend-h"><span id="t-name"></span> over time</h2>
+      <p>Long-run prices from the FHFA index, recent asking prices from Realtor.com, construction from Census permits, and HUD rent benchmarks for the county you picked.</p>
+    </div>
+    <div class="charts">
+      <figure class="chart"><figcaption><b>House price index</b><span>Repeat-sales index, 2000 = 100. Tracks change, not dollar level.</span></figcaption>
+        <div class="plot" id="c-hpi" role="img"></div><div id="d-hpi"></div>
+        <p class="src">Source: <a href="https://www.fhfa.gov/data/hpi">FHFA House Price Index</a>, annual</p></figure>
+      <figure class="chart"><figcaption><b>Median listing price</b><span>Monthly asking price, Realtor.com. Published for 12 larger counties.</span></figcaption>
+        <div class="plot" id="c-lp" role="img"></div><div id="d-lp"></div>
+        <p class="src">Source: <a href="https://fred.stlouisfed.org">Realtor.com via FRED</a>, monthly</p></figure>
+      <figure class="chart"><figcaption><b>Homes authorized by permit</b><span>New residential units per year, single-family vs. multifamily.</span></figcaption>
+        <div class="plot" id="c-perm" role="img"></div>
+        <div class="key"><span><i style="background:var(--sf)"></i>Single-family</span><span><i style="background:var(--mf)"></i>Multifamily (2+ units)</span></div>
+        <div id="d-perm"></div>
+        <p class="src">Source: <a href="https://www.census.gov/construction/bps">Census Building Permits Survey</a>. Authorized, not necessarily built.</p></figure>
+      <figure class="chart"><figcaption><b>Fair Market Rent by bedroom</b><span>HUD benchmark (about the 40th percentile of local rents), FY<span id="fmrY"></span>.</span></figcaption>
+        <div class="plot" id="c-fmr" role="img"></div><div id="d-fmr"></div>
+        <p class="src">Source: <a href="https://www.huduser.gov/portal/datasets/fmr.html">HUD Fair Market Rents</a>. Dashed line: ACS median gross rent.</p></figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="build-h">
+    <div class="sec-head">
+      <p class="eyebrow">New construction, 2025</p>
+      <h2 id="build-h">Where West Virginia is building</h2>
+    </div>
+    <div class="build">
+      <div>
+        <div class="bigfig num" id="share"></div>
+        <p class="bigfig-cap" id="share-cap"></p>
+      </div>
+      <div class="bars">
+        <div class="bars-head"><b>Residential units authorized, 2025</b>
+          <div class="key" style="margin:0"><span><i style="background:var(--sf)"></i>Single-family</span><span><i style="background:var(--mf)"></i>Multifamily</span></div></div>
+        <div id="bars"></div>
+        <button class="more" id="more" type="button" aria-expanded="false"></button>
+        <p class="src">Source: <a href="https://www.census.gov/construction/bps">U.S. Census Bureau, Building Permits Survey</a>. Residential only; the survey excludes commercial construction.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="table-h">
+    <div class="sec-head">
+      <p class="eyebrow">All 55 counties</p>
+      <h2 id="table-h">The full cross-section</h2>
+      <p>Sort by any column. Select a row to load that county above. A dash means the source publishes no value for that county.</p>
+    </div>
+    <div class="tablebox"><table class="all" id="tbl"><caption>West Virginia counties: home value, listing price per square foot, FHFA price growth, permits, rent, and ownership</caption><thead></thead><tbody></tbody></table></div>
+  </section>
+
+  <footer>
+    <div class="foot">
+      <div><h3>About</h3><p>Residential indicators for every West Virginia county, built for West Virginia University and modeled on the Upper Peninsula Regional Economic Report. Commercial real estate is out of scope: no free county-level data exists.</p></div>
+      <div><h3>Sources</h3><ul>
+        <li><a href="https://www.census.gov/programs-surveys/acs">Census ACS 5-year</a> (55 counties)</li>
+        <li><a href="https://www.fhfa.gov/data/hpi">FHFA House Price Index</a> (41 counties)</li>
+        <li><a href="https://fred.stlouisfed.org">Realtor.com via FRED</a> (12 counties)</li>
+        <li><a href="https://www.census.gov/construction/bps">Census Building Permits</a> · <a href="https://www.huduser.gov/portal/datasets/fmr.html">HUD FMR</a></li></ul></div>
+      <div><h3>Method</h3><p>Coverage gaps are shown, never filled. County boundaries from U.S. Census via plotly. Not affiliated with or endorsed by any listed source. Accessibility target: WCAG 2.1 AA.</p></div>
+    </div>
+  </footer>
+</main>

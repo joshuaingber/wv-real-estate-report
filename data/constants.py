@@ -133,14 +133,56 @@ MAP_SEQUENTIAL_BLUE = [
 ]
 
 # ── Typography ───────────────────────────────────────────────────────────────
-# WVU's web/body workhorse is Helvetica (Helvetica Neue). The brand display faces
-# (Config, Antonia) are Adobe-licensed and not freely embeddable, so we use the
-# Helvetica/Arial system stack the WVU Design System falls back to.
-WVU_FONT_FAMILY = '"Helvetica Neue", Helvetica, Arial, sans-serif'
-PLOTLY_FONT = "Helvetica Neue, Helvetica, Arial, sans-serif"
-# No Google Fonts import needed — the Helvetica stack is system-resident. Kept as
-# an empty string so build.py can inject it unconditionally.
-GOOGLE_FONTS_IMPORT = ""
+# The static report (build.py → docs/) uses three freely-embeddable Google Fonts,
+# loaded from a <link> in the document head:
+#   Archivo (variable width)  — display / headings (font-stretch 105–125%, 750–900)
+#   Public Sans               — body text
+#   IBM Plex Mono             — labels, FIPS codes, axis ticks, source lines
+# All three degrade to a system stack if the CDN is unreachable. The Streamlit app
+# and the Plotly builders (components/*) fall back to the same stacks.
+GOOGLE_FONTS_IMPORT = (
+    '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
+    "family=Archivo:wdth,wght@62..125,400..900&"
+    "family=IBM+Plex+Mono:wght@400;500&"
+    'family=Public+Sans:ital,wght@0,400..700;1,400&display=swap">'
+)
+WVU_FONT_FAMILY = '"Public Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'
+PLOTLY_FONT = "Public Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
+
+# ── Web design tokens (static report) ─────────────────────────────────────────
+# The full light/dark palette that drives the inline-SVG report. Copied verbatim
+# from the redesign reference's :root (light) and prefers-color-scheme: dark
+# blocks so the CSS custom properties are a single source of truth here.
+# build.py emits these as :root, a dark @media block, and [data-theme] overrides.
+# Roles: heading/link ink, gold FILLS only (--gold), gold TEXT on light (--gold-text
+# = Old Gold #7F6310, ~5.4:1), decline (--neg = Woodburn), navy masthead (--band-*),
+# chart marks (--line/--area/--sf/--mf/--sel-*), and the two 7-stop choropleth
+# ramps: --s0…--s6 (sequential, levels) and --g0…--g6 (growth), one set per theme.
+CSS_TOKENS_LIGHT = """\
+  --ground:#F3F5F8; --surface:#FFFFFF; --ink:#12213A; --ink-2:#34425A; --muted:#55617A;
+  --rule:#D6DDE6; --rule-strong:#8E99AB;
+  --heading:#002855; --link:#002855; --gold:#EEAA00; --gold-text:#7F6310;
+  --neg:#8D4638; --pos:#1F6F3F; --focus:#002855;
+  --band:#002855; --band-ink:#FFFFFF; --band-muted:#B8C7DB; --band-line:#2B4C77; --band-shape:#0D3A6B; --band-tick:#9FB4CF;
+  --line:#002855; --area:rgba(0,40,85,.08); --sf:#002855; --mf:#EEAA00; --hatch:#A9B4C3; --hatch-bg:#EEF1F5;
+  --sel-halo:#EEAA00; --sel-core:#12213A; --map-edge:#FFFFFF; --tip-bg:#12213A; --tip-ink:#FFFFFF;
+  --s0:#E4EAF1; --s1:#C4D3E4; --s2:#95B3D2; --s3:#6190BF; --s4:#3169A3; --s5:#114782; --s6:#002855;
+  --g0:#8D4638; --g1:#F1CF6B; --g2:#CAD7E7; --g3:#90AFD1; --g4:#5282B6; --g5:#215790; --g6:#002855;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Public Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;"""
+
+CSS_TOKENS_DARK = """\
+  --ground:#07111E; --surface:#0D1B2E; --ink:#E6EBF2; --ink-2:#C3CCD9; --muted:#97A4B7;
+  --rule:#1D2E46; --rule-strong:#56667E;
+  --heading:#E6EBF2; --link:#9CC2EA; --gold-text:#EEAA00; --neg:#E28B77; --pos:#6CC08E; --focus:#EEAA00;
+  --band:#0A2140; --band-ink:#FFFFFF; --band-muted:#A9BAD0; --band-line:#223F66; --band-shape:#14375F; --band-tick:#8FA7C6;
+  --line:#9CC2EA; --area:rgba(156,194,234,.12); --sf:#6E9FD6; --mf:#EEAA00; --hatch:#35465E; --hatch-bg:#0D1B2E;
+  --sel-halo:#EEAA00; --sel-core:#FFFFFF; --map-edge:#07111E; --tip-bg:#E6EBF2; --tip-ink:#07111E;
+  --s0:#17294A; --s1:#1F3B63; --s2:#2A5387; --s3:#3C6EA8; --s4:#5A90C8; --s5:#88B4DF; --s6:#C4DCF3;
+  --g0:#D27561; --g1:#C9971F; --g2:#213A5C; --g3:#325A8C; --g4:#4C7EBA; --g5:#7AA9DC; --g6:#BDD8F3;"""
 
 # Per-county identity colors for single-county trend lines. Thin marks on white
 # must clear WCAG 1.4.11 (>=3:1), so bright gold is swapped for its dark token.

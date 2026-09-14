@@ -16,10 +16,40 @@ free county-level data exists).
   `RealEstateData` container and `latest_summary()` (one row per county).
 - `components/*` — chart builders returning `plotly.graph_objects.Figure`
   (`maps.py`, `trends.py`, `permits.py`, `affordability.py`) and the KPI card
-  (`county_kpi.py`, returns HTML + a Streamlit `render`).
-- `app.py` — Streamlit app. `build.py` — static generator → `docs/`.
+  (`county_kpi.py`, returns HTML + a Streamlit `render`). **Used only by the
+  Streamlit app now** — the static build no longer imports them.
+- `app.py` — Streamlit app (still Plotly). `build.py` — static generator → `docs/`.
 - `utils/` — formatting + narrative helpers. `data/analysis.py` — STL trend +
   projection (monthly).
+
+## Static build (docs/) — inline SVG, no Plotly
+
+The `docs/` site is a token-driven, dependency-free redesign (inline SVG + vanilla
+JS, no charting library, no CDN). `build.py` does three things: emit the design
+tokens, build **one JSON payload** (`D`), and stitch pages from three verbatim
+presentation assets.
+
+- `assets/report.css`, `assets/report_body.html`, `assets/report.js` — the design
+  reference's style, markup and interaction logic, copied verbatim. Edit these to
+  change the page's look/behavior; `build.py` only injects data. `index.html` is
+  `<token CSS> + report.css + report_body.html + <script>const D=…; report.js`.
+- **Payload** (`build_payload`): per county `{f,n,c(centroid),hv,ppsf,g,pt,psf,
+  rent,own,vac,built,dom, hpi[],lps[],perm[],fmr[]}` + `paths` (from
+  `data.geo.project_counties`, an equirectangular projection of the cached
+  GeoJSON to a shared pixel box) + `W,H,acsYear,fmrYear`. Missing → `null`.
+- **Tokens** live in `constants.py` as `CSS_TOKENS_LIGHT` / `CSS_TOKENS_DARK`
+  (verbatim from the reference `:root` + dark blocks); `build.py::_token_css()`
+  emits `:root`, a dark `@media` block, and `[data-theme]` overrides.
+- **Embeds** (`docs/embeds/`): per-county pages render inline (no iframe) with a
+  self-contained `EMBED_JS` copy of the chart primitives; map pages are
+  server-rendered static SVG (`_map_embed`). Fixed class breaks + measure specs
+  are duplicated in `build.py::MAP_METRICS` to match `report.js`'s `METRICS`.
+- **Vintage labels are hardcoded in `assets/report.js`** to the reference's data
+  (FHFA growth "2022 to 2023", permits "2025"); ACS/FMR years are dynamic (from
+  `D`). When FHFA/permits publish a newer year, bump those literal strings in
+  `report.js` and the `MAP_METRICS` titles.
+- **Fonts:** Archivo (display) / Public Sans (body) / IBM Plex Mono (labels), via
+  `GOOGLE_FONTS_IMPORT` (a head `<link>`) in `constants.py`.
 
 ## Data-source facts (verified 2026-09)
 
@@ -51,7 +81,12 @@ free county-level data exists).
 
 ## Common tasks
 
-- Add a metric: extend the relevant fetcher + `latest_summary()`, then a builder
-  in `components/` and a block in `build.py` (+ `app.py`).
-- Re-brand: edit the palette block in `constants.py`.
-- New data vintage: fetchers auto-detect the newest year; just rerun `build.py`.
+- Add a metric: extend the relevant fetcher + `latest_summary()`, then add it to
+  the payload in `build.py::build_payload`, a `METRICS` entry in
+  `assets/report.js` (map + profile), and a Plotly builder in `components/` for
+  `app.py`.
+- Re-skin the static site: edit `CSS_TOKENS_*` in `constants.py` (colors) and
+  `assets/report.css` (layout); re-brand Plotly for the app via the palette hexes.
+- New data vintage: fetchers auto-detect the newest year; rerun `build.py`. Bump
+  the hardcoded FHFA/permit year labels in `assets/report.js` + `MAP_METRICS` if
+  the vintage rolled over.

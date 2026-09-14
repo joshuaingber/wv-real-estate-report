@@ -10,18 +10,36 @@ Virginia University.
 
 ## What it shows
 
-- **Statewide maps** — median home value, median listing price per square foot,
-  year-over-year home-price growth, and residential permits, each as a
-  hover-enabled county choropleth.
-- **Residential construction** — permitted units by county and, per county, the
-  single-family / multifamily split over time.
-- **County detail** — a KPI card plus price trends (long-run FHFA index and
-  recent monthly listings), permit history, and Fair Market Rents for every
-  county, in an embeddable page.
-- **Full data table** and a "source data" link on every chart.
+- **The Atlas** — one large choropleth with a four-way switch (home value, price
+  per square foot, home-price growth, permits). Shading uses fixed dollar/percent
+  class breaks, so a color means the same range on every measure. Beside it, a
+  county profile: rank, a position strip, and a nine-metric KPI grid.
+- **Masthead strip plot** — all 55 county median home values on one dollar axis;
+  hovering a tick lights that county on the state silhouette.
+- **County trends** — long-run FHFA index, monthly listing price, the
+  single-family / multifamily permit split by year, and HUD Fair Market Rents by
+  bedroom, for the selected county.
+- **Residential construction** — the statewide 2025 total and a ranked bar list.
+- **Sortable all-counties table**; selecting a county from any control (map,
+  picker, bar row, table row, strip plot) updates everything at once.
 
-Every chart has a text alternative (a collapsible data table) and the site
-targets **WCAG 2.1 AA** (WVU / ADA Title II).
+The static site (`docs/`) is **inline SVG + vanilla JS driven by one JSON
+payload** — no charting library and no CDN, so it renders offline and themes
+cleanly in light and dark mode. Every chart has a text alternative (a collapsible
+data table), a source link, and a specific `aria-label`; the site targets
+**WCAG 2.1 AA** (WVU / ADA Title II). The Streamlit app (`app.py`) still uses
+Plotly.
+
+### Design system
+
+- **Type:** Archivo (variable-width display), Public Sans (body), IBM Plex Mono
+  (labels, FIPS codes, axis ticks) — loaded from Google Fonts, with system
+  fallbacks.
+- **Color:** WVU Blue `#002855` for primary ink and the masthead; WVU Gold
+  `#EEAA00` for fills only; Old Gold `#7F6310` for gold as text on light; Woodburn
+  `#8D4638` for declines. Two seven-stop choropleth ramps (`--s0…--s6` sequential,
+  `--g0…--g6` growth), one set per theme. Full light/dark token set lives in
+  `data/constants.py` (`CSS_TOKENS_LIGHT` / `CSS_TOKENS_DARK`).
 
 ## Data sources (all free, public, and cacheable)
 
