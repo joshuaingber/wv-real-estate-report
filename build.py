@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import html as _html
 import json
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -53,6 +54,9 @@ ASSETS_DIR = ROOT / "assets"
 REPORT_CSS = (ASSETS_DIR / "report.css").read_text()
 REPORT_BODY = (ASSETS_DIR / "report_body.html").read_text()
 REPORT_JS = (ASSETS_DIR / "report.js").read_text()
+
+# Binary assets copied verbatim into docs/ (referenced by relative URL, not inlined).
+STATIC_ASSETS = ["wvu-flying-wv.png"]
 
 
 # ── Design-token CSS (single source of truth: data/constants.py) ──────────────
@@ -463,6 +467,9 @@ def main():
 
     payload = build_payload(data, summary, proj)
     by_fips = {c["f"]: c for c in payload["counties"]}
+
+    for name in STATIC_ASSETS:
+        shutil.copy(ASSETS_DIR / name, DOCS_DIR / name)
 
     print("Writing index.html …")
     (DOCS_DIR / "index.html").write_text(build_index(payload))

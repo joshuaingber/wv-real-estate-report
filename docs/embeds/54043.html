@@ -57,6 +57,13 @@ h1,h2,h3 { font-family:var(--display); color:var(--heading); margin:0; text-wrap
 
 /* ── Masthead ───────────────────────────────────── */
 .mast { background:var(--band); color:var(--band-ink); padding-block:clamp(28px,5vw,56px) 28px; }
+.brandbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px 28px; padding-bottom:18px; margin-bottom:20px; border-bottom:1px solid var(--band-line); }
+.brandbar-logo { display:inline-flex; align-items:center; }
+.brandbar-logo img { height:clamp(38px,4.4vw,52px); width:auto; display:block; background:#fff; padding:7px 10px; border-radius:9px; box-sizing:content-box; }
+.brandbar-wordmark { font-family:var(--mono); font-size:.9rem; color:var(--band-ink); letter-spacing:.01em; }
+.brandbar-wordmark b { color:var(--gold); font-weight:700; }
+.brandbar-attr { margin:0; max-width:34em; font-size:clamp(.9rem,1.3vw,1.02rem); line-height:1.4; color:var(--band-muted); }
+.brandbar-attr strong { color:var(--band-ink); font-weight:650; }
 .mast .eyebrow { color:var(--band-muted); display:flex; flex-wrap:wrap; gap:.4rem 1.1rem; }
 .mast .eyebrow span + span::before { content:""; display:inline-block; width:5px; height:5px; background:var(--gold); margin-right:1.1rem; transform:translateY(-2px) rotate(45deg); }
 .mast-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:clamp(20px,4vw,56px); align-items:center; margin-top:1.4rem; }
